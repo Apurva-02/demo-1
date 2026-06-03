@@ -1,554 +1,524 @@
-# demo-1
-This is my first repositary
-Author - Apurva
+If your goal is to **actually perform the experiment and deploy an EC2 instance using Terraform on AWS**, follow this complete step-by-step guide.
 
+# Experiment No. 10
 
-# Procedure: Create a RESTful Web Application Using Express.js with Routing, Middleware, and Error Handling
+# Deployment of End-to-End Architecture using Terraform on AWS
 
-### Step 1: Install Node.js
+## Prerequisites
 
-1. Download and install Node.js from the official website:
+Before starting, make sure you have:
 
-   * [Node.js Official Website](https://nodejs.org?utm_source=chatgpt.com)
-2. Verify installation by opening Command Prompt and running:
-
-```bash
-node -v
-npm -v
-```
-
-Both commands should display version numbers.
+* AWS Account
+* Windows Laptop/Desktop
+* Internet Connection
+* Administrator Access
 
 ---
 
-### Step 2: Create a New Project Folder
+# Step 1: Create AWS Account
 
-Create a folder for the experiment and open it in VS Code.
+1. Open AWS website:
 
-```bash
-mkdir ExpressRESTAPI
-cd ExpressRESTAPI
-```
+   [https://aws.amazon.com](https://aws.amazon.com)
 
----
+2. Click **Create AWS Account**
 
-### Step 3: Initialize Node.js Project
+3. Complete registration
 
-Run the following command:
+4. Add payment details
 
-```bash
-npm init -y
-```
+5. Verify phone number
 
-This creates a `package.json` file containing project information.
+6. Login to AWS Console
 
 ---
 
-### Step 4: Install Express.js
+# Step 2: Create IAM User for Terraform
 
-Install Express framework using npm:
+### Open
 
-```bash
-npm install express
-```
+AWS Console → IAM
 
-After installation, a `node_modules` folder and `package-lock.json` file will be created.
+### Create User
 
----
-
-### Step 5: Create Application File
-
-Create a file named:
+1. IAM → Users
+2. Click **Create User**
+3. Username:
 
 ```text
-app.js
+terraform-user
 ```
 
-Project structure:
+4. Next
+
+---
+
+### Attach Permissions
+
+Select:
 
 ```text
-ExpressRESTAPI
-│
-├── node_modules
-├── package.json
-├── package-lock.json
-└── app.js
+AdministratorAccess
+```
+
+For educational purposes only.
+
+Click:
+
+```text
+Create User
 ```
 
 ---
 
-### Step 6: Write the Program
+### Generate Access Keys
 
-Copy and paste the given code into `app.js`.
+Open created user
 
-```javascript
-const express = require('express');
-const app = express();
+Go to:
 
-app.use(express.json());
-
-app.use((req, res, next) => {
-    console.log(`${req.method} request for ${req.url}`);
-    next();
-});
-
-let users = [
-    { id: 1, name: 'Rahul' },
-    { id: 2, name: 'Priya' }
-];
-
-app.get('/users', (req, res) => {
-    res.json(users);
-});
-
-app.get('/users/:id', (req, res) => {
-    const user = users.find(u => u.id == req.params.id);
-    if (user) {
-        res.json(user);
-    } else {
-        res.status(404).send('User not found');
-    }
-});
-
-app.post('/users', (req, res) => {
-    const newUser = { id: users.length + 1, name: req.body.name };
-    users.push(newUser);
-    res.status(201).json(newUser);
-});
-
-app.put('/users/:id', (req, res) => {
-    const user = users.find(u => u.id == req.params.id);
-    if (user) {
-        user.name = req.body.name;
-        res.json(user);
-    } else {
-        res.status(404).send('User not found');
-    }
-});
-
-app.delete('/users/:id', (req, res) => {
-    const index = users.findIndex(u => u.id == req.params.id);
-    if (index !== -1) {
-        const deletedUser = users.splice(index, 1);
-        res.json(deletedUser);
-    } else {
-        res.status(404).send('User not found');
-    }
-});
-
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).send('Something broke!');
-});
-
-const port = 3000;
-
-app.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}`);
-});
+```text
+Security Credentials
 ```
 
-Save the file.
+Click:
+
+```text
+Create Access Key
+```
+
+Select:
+
+```text
+Command Line Interface (CLI)
+```
+
+Download:
+
+```text
+Access Key ID
+Secret Access Key
+```
+
+Save them safely.
 
 ---
 
-### Step 7: Run the Application
+# Step 3: Install AWS CLI
 
-Open terminal and execute:
+Download:
+
+[https://aws.amazon.com/cli/](https://aws.amazon.com/cli/)
+
+Install AWS CLI.
+
+Verify installation:
 
 ```bash
-node app.js
+aws --version
 ```
 
-Output:
+Expected:
 
-```text
-Server running on http://localhost:3000
-```
-
-The server is now running.
-
----
-
-### Step 8: Test GET Request (Read All Users)
-
-Open browser and visit:
-
-```text
-http://localhost:3000/users
-```
-
-Output:
-
-```json
-[
-  {
-    "id": 1,
-    "name": "Rahul"
-  },
-  {
-    "id": 2,
-    "name": "Priya"
-  }
-]
+```bash
+aws-cli/2.x.x
 ```
 
 ---
 
-### Step 9: Test GET Request (Read Single User)
+# Step 4: Configure AWS CLI
 
-Open:
+Open Command Prompt
 
-```text
-http://localhost:3000/users/1
+Run:
+
+```bash
+aws configure
 ```
 
-Output:
+Enter:
+
+```bash
+AWS Access Key ID:
+```
+
+Paste your Access Key.
+
+```bash
+AWS Secret Access Key:
+```
+
+Paste Secret Key.
+
+```bash
+Default region:
+```
+
+Example:
+
+```bash
+us-east-1
+```
+
+Output format:
+
+```bash
+json
+```
+
+---
+
+Verify:
+
+```bash
+aws sts get-caller-identity
+```
+
+If successful you will see:
 
 ```json
 {
-  "id": 1,
-  "name": "Rahul"
+ "UserId":"...",
+ "Account":"...",
+ "Arn":"..."
 }
 ```
 
 ---
 
-### Step 10: Test POST Request Using Postman
+# Step 5: Install Terraform
 
-1. Open Postman.
-2. Select **POST** method.
-3. Enter URL:
+Download Terraform:
+
+[https://developer.hashicorp.com/terraform/downloads](https://developer.hashicorp.com/terraform/downloads)
+
+Download Windows AMD64 version.
+
+Extract ZIP.
+
+Example:
 
 ```text
-http://localhost:3000/users
+C:\Terraform
 ```
 
-4. Go to **Body → raw → JSON**.
-5. Enter:
+Contains:
 
-```json
-{
-  "name": "Amit"
-}
-```
-
-6. Click **Send**.
-
-Output:
-
-```json
-{
-  "id": 3,
-  "name": "Amit"
-}
+```text
+terraform.exe
 ```
 
 ---
 
-### Step 11: Test PUT Request Using Postman
+# Step 6: Add Terraform to PATH
 
-1. Select **PUT** method.
-2. URL:
+### Environment Variables
 
-```text
-http://localhost:3000/users/2
-```
-
-3. Body:
-
-```json
-{
-  "name": "Priya Sharma"
-}
-```
-
-4. Click **Send**.
-
-Output:
-
-```json
-{
-  "id": 2,
-  "name": "Priya Sharma"
-}
-```
-
----
-
-### Step 12: Test DELETE Request Using Postman
-
-1. Select **DELETE** method.
-2. URL:
+Add:
 
 ```text
-http://localhost:3000/users/1
+C:\Terraform
 ```
 
-3. Click **Send**.
+to System PATH.
 
-Output:
+Restart CMD.
 
-```json
-[
-  {
-    "id": 1,
-    "name": "Rahul"
-  }
-]
-```
-
----
-
-### Step 13: Observe Middleware Execution
-
-In the terminal, request logs will appear:
-
-```text
-GET request for /users
-GET request for /users/1
-POST request for /users
-PUT request for /users/2
-DELETE request for /users/1
-```
-
-This confirms that the middleware is executing before every request.
-
----
-
-### Step 14: Test Error Handling
-
-Try accessing a non-existing user:
-
-```text
-http://localhost:3000/users/100
-```
-
-Output:
-
-```text
-User not found
-```
-
-Status Code:
-
-```text
-404 Not Found
-```
-
----
-
-### Step 15: Stop the Server
-
-Press:
-
-```text
-Ctrl + C
-```
-
-in the terminal.
-
-The Express server will stop.
-
----
-
-## Viva Questions
-
-1. What is Express.js?
-2. What is middleware in Express.js?
-3. What is REST API?
-4. Difference between GET and POST methods?
-5. What is the purpose of `express.json()` middleware?
-6. How is routing implemented in Express.js?
-7. What is error-handling middleware?
-8. Difference between PUT and PATCH methods?
-9. Why do we use `next()` in middleware?
-10. What is the role of `app.listen()` in Express.js?
-
-These steps can be directly written in your practical journal under the **Procedure** section.
-
-
-If you want to test **all GET, POST, PUT, and DELETE methods using only a browser**, then GET requests can be tested directly from the browser URL bar, but POST, PUT, and DELETE cannot be sent directly from the browser address bar because browsers only send GET requests when you enter a URL.
-
-### Method 1: Test GET Requests Directly
-
-Start the server:
+Verify:
 
 ```bash
-node app.js
+terraform -version
 ```
 
-Open browser:
+Example:
 
-#### GET All Users
-
-```text
-http://localhost:3000/users
-```
-
-Output:
-
-```json
-[
-  { "id": 1, "name": "Rahul" },
-  { "id": 2, "name": "Priya" }
-]
-```
-
-#### GET Single User
-
-```text
-http://localhost:3000/users/1
-```
-
-Output:
-
-```json
-{ "id": 1, "name": "Rahul" }
+```bash
+Terraform v1.8.x
 ```
 
 ---
 
-## Method 2: Test POST, PUT, DELETE Using Browser Console
+# Step 7: Create Project Folder
 
-Open browser and press:
+Create folder:
 
 ```text
-F12 → Console
+Terraform-AWS
 ```
 
-### POST Request
+Open CMD inside folder.
+
+---
+
+# Step 8: Create Terraform File
+
+Create:
+
+```text
+main.tf
+```
 
 Paste:
 
-```javascript
-fetch('http://localhost:3000/users', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-        name: 'Amit'
-    })
-})
-.then(res => res.json())
-.then(data => console.log(data));
-```
-
-Output:
-
-```json
-{
-  "id": 3,
-  "name": "Amit"
+```terraform
+provider "aws" {
+  region = "us-east-1"
 }
-```
 
----
+resource "aws_instance" "example" {
 
-### PUT Request
+  ami           = "ami-053b0d53c279acc90"
+  instance_type = "t2.micro"
 
-Paste:
-
-```javascript
-fetch('http://localhost:3000/users/2', {
-    method: 'PUT',
-    headers: {
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-        name: 'Priya Sharma'
-    })
-})
-.then(res => res.json())
-.then(data => console.log(data));
-```
-
-Output:
-
-```json
-{
-  "id": 2,
-  "name": "Priya Sharma"
-}
-```
-
----
-
-### DELETE Request
-
-Paste:
-
-```javascript
-fetch('http://localhost:3000/users/1', {
-    method: 'DELETE'
-})
-.then(res => res.json())
-.then(data => console.log(data));
-```
-
-Output:
-
-```json
-[
-  {
-    "id": 1,
-    "name": "Rahul"
+  tags = {
+    Name = "TerraformInstance"
   }
-]
-```
-
----
-
-## Method 3: Test Using Simple HTML Forms (Recommended for Practical Exam)
-
-Create a file named `index.html`:
-
-```html
-<!DOCTYPE html>
-<html>
-<head>
-    <title>REST API Test</title>
-</head>
-<body>
-
-<h2>Add User</h2>
-<input type="text" id="username" placeholder="Enter Name">
-<button onclick="addUser()">POST User</button>
-
-<script>
-function addUser() {
-    fetch('http://localhost:3000/users', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            name: document.getElementById('username').value
-        })
-    })
-    .then(res => res.json())
-    .then(data => alert(JSON.stringify(data)));
 }
-</script>
-
-</body>
-</html>
 ```
-
-Open this file in a browser and click the button to test the POST API.
 
 ---
 
-### Important Viva Answer
+# Step 9: Initialize Terraform
 
-**Can all REST methods be tested directly from the browser URL bar?**
+Run:
 
-**Answer:** No. Only **GET** requests can be tested directly from the browser URL bar. For **POST**, **PUT**, and **DELETE** requests, we must use:
+```bash
+terraform init
+```
 
-* Postman
-* Browser Developer Console (Fetch API)
-* HTML Forms with JavaScript
-* API testing tools
+Terraform downloads AWS Provider.
 
-This is the correct theoretical answer for your practical exam.
+Expected:
+
+```text
+Terraform has been successfully initialized
+```
+
+---
+
+# Step 10: Validate Configuration
+
+Run:
+
+```bash
+terraform validate
+```
+
+Expected:
+
+```text
+Success! The configuration is valid.
+```
+
+---
+
+# Step 11: Check Deployment Plan
+
+Run:
+
+```bash
+terraform plan
+```
+
+Terraform shows:
+
+```text
+1 to add
+0 to change
+0 to destroy
+```
+
+No resources are created yet.
+
+---
+
+# Step 12: Deploy Infrastructure
+
+Run:
+
+```bash
+terraform apply
+```
+
+Terraform asks:
+
+```text
+Do you want to perform these actions?
+```
+
+Type:
+
+```text
+yes
+```
+
+Press Enter.
+
+Terraform creates:
+
+```text
+EC2 Instance
+```
+
+Expected:
+
+```text
+Apply complete!
+```
+
+---
+
+# Step 13: Verify on AWS Console
+
+Go to:
+
+```text
+AWS Console
+```
+
+Then:
+
+```text
+EC2
+```
+
+Then:
+
+```text
+Instances
+```
+
+You should see:
+
+```text
+TerraformInstance
+```
+
+Status:
+
+```text
+Running
+```
+
+---
+
+# Step 14: Get Instance Information
+
+Run:
+
+```bash
+terraform show
+```
+
+You can see:
+
+* Instance ID
+* Public IP
+* Private IP
+* Region
+
+---
+
+# Step 15: Save Infrastructure State
+
+Terraform automatically creates:
+
+```text
+terraform.tfstate
+```
+
+This file stores resource information.
+
+Do not delete it.
+
+---
+
+# Step 16: Destroy Infrastructure (Important)
+
+After experiment completion:
+
+```bash
+terraform destroy
+```
+
+Type:
+
+```text
+yes
+```
+
+Terraform removes EC2 instance.
+
+Expected:
+
+```text
+Destroy complete
+```
+
+This avoids AWS charges.
+
+---
+
+# Viva Questions
+
+### What is Terraform?
+
+Terraform is an Infrastructure as Code (IaC) tool used to automate cloud infrastructure deployment.
+
+---
+
+### What is IaC?
+
+Infrastructure as Code is the process of managing infrastructure using code instead of manual configuration.
+
+---
+
+### What command initializes Terraform?
+
+```bash
+terraform init
+```
+
+---
+
+### What command shows execution plan?
+
+```bash
+terraform plan
+```
+
+---
+
+### What command deploys resources?
+
+```bash
+terraform apply
+```
+
+---
+
+### What command deletes resources?
+
+```bash
+terraform destroy
+```
+
+---
+
+### What is AWS EC2?
+
+Amazon Elastic Compute Cloud (EC2) is a virtual machine service provided by AWS.
+
+---
+
+### What file stores Terraform state?
+
+```text
+terraform.tfstate
+```
+
+---
+
+# Expected Result
+
+**An EC2 instance was successfully deployed on Amazon Web Services using Terraform. The infrastructure was created automatically through Terraform configuration files, demonstrating Infrastructure as Code (IaC) and cloud resource automation.**
